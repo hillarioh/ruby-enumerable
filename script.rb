@@ -153,6 +153,17 @@ module Enumerable
 
     def my_map
 
+        arrayed = []
+
+        for i in self
+            if block_given?
+                arrayed << yield(i)
+                
+            end
+        end
+
+        return arrayed
+
     end
 
     def my_inject
@@ -208,8 +219,20 @@ end
 # wrd_len2 = animals.my_none? { |word| word.length >= 4 } #=> false
 # puts wrd_len2
 
+# Test for count
+
 # ary.count               #=> 4
 # ary.count(2)            #=> 2
 # ary.count{ |x| x%2==0 } #=> 3
 
-print [1,2,3,2,2,3,2,3].my_count(2)
+# print [1,2,3,2,2,3,2,3].my_count(2)
+
+# Test for map
+
+salaries = [1200, 1500, 1100, 1800]
+
+puts salaries.my_map { |salary| salary - 700 }
+#=> [500, 800, 400, 1100]
+
+
+
