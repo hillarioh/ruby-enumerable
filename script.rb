@@ -44,7 +44,7 @@ module Enumerable
         
         arrayed = []
 
-        my_each {|i| arrayed << item if yield(i) == true}
+        my_each {|i| arrayed << i if yield(i) == true}
 
        return arrayed
 
@@ -115,9 +115,39 @@ module Enumerable
 
     end
 
-    def my_count
+    
 
+    def my_count(val=1)
+
+        num = 0
+
+        if val==1 && block_given?
+
+            arrayed = []
+            my_each {|i| arrayed << i if yield(i) == true}
+
+            num = arrayed.size
+
+       
+             
+        elsif val==1
+            track = 0
+
+            for i in self
+                track +=1
+            end
+
+            num = track
+            puts num
+ 
+        else
+            
+            arrayed = self.my_select { |ent| ent == val} 
+
+            num = arrayed.size
+        end
         
+        return num
 
     end
 
@@ -153,6 +183,7 @@ end
 
 # friends.my_select { |friend| friend != 'Brian'  }
 
+
 # # Test for all?
 # ages = [ 19, 59, 70, 23, 140 ]
 
@@ -176,3 +207,9 @@ end
 # animal = ["ant","bear","cat"]
 # wrd_len2 = animals.my_none? { |word| word.length >= 4 } #=> false
 # puts wrd_len2
+
+# ary.count               #=> 4
+# ary.count(2)            #=> 2
+# ary.count{ |x| x%2==0 } #=> 3
+
+print [1,2,3,2,2,3,2,3].my_count(2)
