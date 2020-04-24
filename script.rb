@@ -172,6 +172,21 @@ module Enumerable
 
     def my_inject
 
+        result = 0
+
+        for i in 0...self.size-1
+            if block_given?
+                self[i+1]=yield(self[i],self[i+1])
+            end
+            if i == self.size-2
+                result = self[i+1]
+            end
+        end
+
+
+        return result
+        
+
     end
 
     def multiply_els
@@ -233,10 +248,15 @@ end
 
 # Test for map
 
-salaries = [1200, 1500, 1100, 1800]
+# salaries = [1200, 1500, 1100, 1800]
 
-puts salaries.my_map { |salary| salary - 700 }
+# puts salaries.my_map { |salary| salary - 700 }
 #=> [500, 800, 400, 1100]
 
+
+# Test for inject
+
+# [3, 6, 10, 13].inject(0, :+) => 32
+puts [3, 6, 37, 45, 10].my_inject {|sum, number| sum + number}
 
 
