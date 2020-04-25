@@ -1,6 +1,16 @@
 # ruby-enumerable
 
-It is a project about building methods with same functionality as the enurable methods
+It is a project about building methods with same functionality as the enumerable methods
+
+- #my_each
+- #my_each_with_index
+- #my_select
+- #my_all?
+- #my_any?
+- #my_none?
+- #my_count
+- #my_map
+- #my_inject
 
 # What it does
 
