@@ -1,41 +1,42 @@
-## IF I USE RUBOCOP ON THIS PROJECT IT IS GOING TO INSERT THE ENUMERABLE METHODS TO THE FILES IF ITS OKAY
-# I CAN STILL ADD THEM
+## by Hillarioh
 
 module Enumerable
   def my_each
-    each do |i|
-      block_given? ? yield(i) : break
+    i = 0
+
+    while i < size
+      block_given? ? yield(self[i]) : break
+      i += 1
     end
   end
 
   def my_each_with_index
-    (0...size).each do |i|
+    i = 0
+
+    while i < size
       block_given? ? yield(self[i], i) : break
+      i += 1
     end
   end
 
   def my_select
     arrayed = []
-
     my_each { |i| arrayed << i if yield(i) == true }
-
     arrayed
   end
 
   def my_all?
     arrayed = []
-
     my_each { |i| arrayed << (yield(i) == true) }
-
     state = true
-
-    arrayed.each do |j|
-      next unless j != true
-
-      state = false
-      break
+    j = 0
+    while j < arrayed.size
+      if arrayed[j] != true
+        state = false
+        break
+      end
+      j += 1
     end
-
     state
   end
 
@@ -46,11 +47,16 @@ module Enumerable
 
     state = false
 
-    arrayed.each do |j|
-      next unless j == true
+    j = 0
 
-      state = true
-      break
+    while j < arrayed.size
+      if arrayed[j] == true
+        state = true
+        break
+
+      end
+      j += 1
+
     end
 
     state
@@ -62,12 +68,16 @@ module Enumerable
     my_each { |i| arrayed << (yield(i) == true) }
 
     state = true
+    j = 0
 
-    arrayed.each do |j|
-      next unless j == true
+    while j < arrayed.size
+      if arrayed[j] == true
+        state = false
+        break
 
-      state = false
-      break
+      end
+      j += 1
+
     end
 
     state
@@ -86,8 +96,11 @@ module Enumerable
     elsif val == 1
       track = 0
 
-      each do |_i|
+      i = 0
+
+      while i < size
         track += 1
+        i += 1
       end
 
       num = track
@@ -106,8 +119,12 @@ module Enumerable
   def my_map
     arrayed = []
 
-    each do |i|
-      arrayed << yield(i) if block_given?
+    i = 0
+
+    while i < size
+      arrayed << yield(self[i]) if block_given?
+      i += 1
+
     end
 
     arrayed
@@ -118,9 +135,12 @@ module Enumerable
 
     unshift(val) if val != 1
 
-    (0...size - 1).each do |i|
+    i = 0
+
+    while i < size - 1
       self[i + 1] = yield(self[i], self[i + 1]) if block_given?
       result = self[i + 1] if i == size - 2
+      i += 1
     end
 
     result
