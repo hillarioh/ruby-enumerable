@@ -1,31 +1,4 @@
 
-# Create a script file to house your methods and run it in IRB to test them later.
-# Add your new methods onto the existing Enumerable module. Ruby makes this easy for you because any class or module can be added to without trouble ... just do something like:
-#   module Enumerable
-#     def my_each
-#       # your code here
-#     end
-#   end
-# Create #my_each, a method that is identical to #each but (obviously) does not use #each. You'll need to remember the yield statement. Make sure it returns the same thing as #each as well.
-# Create #my_each_with_index in the same way.
-# Create #my_select in the same way, though you may use #my_each in your definition (but not #each).
-# Create #my_all? (continue as above)
-# Create #my_any?
-# Create #my_none?
-# Create #my_count
-# Create #my_map
-# Create #my_inject
-# Test your #my_inject by creating a method called #multiply_els which multiplies all the elements of the 
-# array together by using #my_inject, e.g. multiply_els([2,4,5]) #=> 40
-# Modify your #my_map method to take a proc instead.
-# Modify your #my_map method to take either a proc or a block. It won't be 
-# necessary to apply both a proc and a block in the same #my_map call since you 
-# could get the same effect by chaining together one #my_map call with the block and one with the proc. 
-# This approach is also clearer,
-# since the user doesn't have to remember whether the proc or block will be run first. 
-# So if both a proc and a block are given, only execute the proc.
-
-
 module Enumerable
 
     def my_each
@@ -170,93 +143,92 @@ module Enumerable
 
     end
 
-    def my_inject
+    def my_inject(val=1)
 
         result = 0
 
+        if val!=1
+            self.unshift(val)
+        end
+       
         for i in 0...self.size-1
             if block_given?
                 self[i+1]=yield(self[i],self[i+1])
+               
             end
             if i == self.size-2
                 result = self[i+1]
             end
         end
 
-
         return result
         
-
     end
+          
+end
 
-    def multiply_els
+def multiply_els(my_array)
 
-    end
-       
+        return my_array.my_inject {|product, number| product * number}
+
 end
 
 # Test for my_each
 
-# ["janet","junior","shem"].my_each{ |elem| puts elem}
+puts ">>>Test for my_each"
+["janet","junior","shem"].my_each{ |elem| puts elem}
+puts ""
+
+puts ">>>Test for my_each_with_index"
+fruits = ["apple", "banana", "strawberry", "pineapple"]
+fruits.my_each_with_index { |fruit, index| puts fruit if index.even? }
+puts ""
+
+puts ">>>Test for select"
+friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+print friends.my_select { |friend| friend != 'Brian'  }
+puts ""
+
+puts ">>>Test for all?"
+ages = [ 19, 59, 70, 23, 140 ]
+valid = ages.my_all? { | age | age > 0 && age <= 222 } 
+puts valid
+puts ""
+
+puts ">>>Test for any?"
+pet_names = ['pluto', 'scooby', 'nyan']
+find_scooby = pet_names.my_any? { | pet | pet == 'scoobyy' }
+puts find_scooby
+puts ""
+
+puts ">>>Test for none?"
+animals = ["ant","bear","cat"]
+wrd_len = animals.my_none? { |word| word.length == 5 } 
+puts wrd_len
 
 
-# Test for my_each_with_index
+wrd_len2 = animals.my_none? { |word| word.length >= 4 } 
+puts wrd_len2
+puts ""
 
-# fruits = ["apple", "banana", "strawberry", "pineapple"]
+puts ">>>Test for count"
+nomb = [1,2,3,2,2,3,2,3]
+puts nomb.count
+puts nomb.my_count(2)
+puts nomb.my_count{ |x| x%2==0 }
+puts ""
 
-# fruits.my_each_with_index { |fruit, index| puts fruit if index.even? }
+puts ">>>Test for map"
+salaries = [1200, 1500, 1100, 1800]
+puts salaries.my_map { |salary| salary - 700 }
+puts ""
 
+puts ">>>Test for inject"
+puts [3, 6, 37, 45, 10].my_inject(2) {|sum, number| sum + number}
+puts [3, 6, 37, 45, 10].my_inject{|sum, number| sum + number}
+puts ""
 
-# Test for select
-
-# friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
-
-# friends.my_select { |friend| friend != 'Brian'  }
-
-
-# # Test for all?
-# ages = [ 19, 59, 70, 23, 140 ]
-
-# valid = ages.my_all? { | age | age > 0 && age <= 222 } 
-
-# Test for any?
-
-# pet_names = ['pluto', 'scooby', 'nyan']
-
-# find_scooby = pet_names.my_any? { | pet | pet == 'scoobyy' }
-
-# puts find_scooby
-
-# Test for none?
-
-# animals = ["ant","bear","cat"]
-# wrd_len = animals.my_none? { |word| word.length == 5 } #=> true
-
-# puts wrd_len
-
-# animal = ["ant","bear","cat"]
-# wrd_len2 = animals.my_none? { |word| word.length >= 4 } #=> false
-# puts wrd_len2
-
-# Test for count
-
-# ary.count               #=> 4
-# ary.count(2)            #=> 2
-# ary.count{ |x| x%2==0 } #=> 3
-
-# print [1,2,3,2,2,3,2,3].my_count(2)
-
-# Test for map
-
-# salaries = [1200, 1500, 1100, 1800]
-
-# puts salaries.my_map { |salary| salary - 700 }
-#=> [500, 800, 400, 1100]
-
-
-# Test for inject
-
-# [3, 6, 10, 13].inject(0, :+) => 32
-puts [3, 6, 37, 45, 10].my_inject {|sum, number| sum + number}
+puts ">>>Test for multuply_els"
+puts multiply_els([3, 6, 37, 45, 10])
 
 
