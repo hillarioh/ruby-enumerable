@@ -2,12 +2,11 @@
 
 module Enumerable
   def my_each
-
-     return enum_for(:my_each) unless block_given?
+    return enum_for(:my_each) unless block_given?
 
     i = 0
 
-    enum=self.to_enum
+    enum = to_enum
 
     while i < size
       yield(enum.next)
@@ -16,14 +15,14 @@ module Enumerable
   end
 
   def my_each_with_index
-     return enum_for(:my_each_with_index) unless block_given?
+    return enum_for(:my_each_with_index) unless block_given?
 
     i = 0
 
-    enum=self.to_enum
+    enum = to_enum
 
     while i < size
-      yield(enum.next,i)
+      yield(enum.next, i)
 
       i += 1
     end
@@ -34,29 +33,24 @@ module Enumerable
 
     arrayed = []
 
-
     my_each { |i| arrayed << i if yield(i) == true }
 
     arrayed
   end
 
-  def my_all?(val=nil)
-
-    if self.size==0
-      return true
-    end
+  def my_all?(val = nil)
+    return true if size == 0
 
     arrayed = []
 
-    if val != nil && val.class == Regexp
-      my_each { |i| arrayed << val.match?(i)   }
+    if !val.nil? && val.class == Regexp
+      my_each { |i| arrayed << val.match?(i) }
     elsif block_given?
       my_each { |i| arrayed << (yield(i) == true) }
-    elsif val !=nil
-       my_each { |i| arrayed << i.is_a? val   }
+    elsif !val.nil?
+      my_each { |i| i.is_a? arrayed << (val ? true : false) }
     end
 
-    
     state = true
     j = 0
 
@@ -71,12 +65,18 @@ module Enumerable
     state
   end
 
-  def my_any?
+  def my_any?(val = nil)
+    return false if size == 0
+
     arrayed = []
 
-    return true unless block_given?
-
-    my_each { |i| arrayed << (yield(i) == true) }
+    if !val.nil? && val.class == Regexp
+      my_each { |i| arrayed << val.match?(i) }
+    elsif block_given?
+      my_each { |i| arrayed << (yield(i) == true) }
+    elsif !val.nil?
+      my_each { |i| i.is_a? arrayed << (val ? true : false) }
+   end
 
     state = false
 
@@ -86,21 +86,25 @@ module Enumerable
       if arrayed[j] == true
         state = true
         break
-
       end
       j += 1
-
     end
 
     state
   end
 
-  def my_none?
+  def my_none?(val = nil)
+    return true if size == 0
+
     arrayed = []
 
-    return true unless block_given?
-
-    my_each { |i| arrayed << (yield(i) == true) }
+    if !val.nil? && val.class == Regexp
+      my_each { |i| arrayed << val.match?(i) }
+    elsif block_given?
+      my_each { |i| arrayed << (yield(i) == true) }
+    elsif !val.nil?
+      my_each { |i| i.is_a? arrayed << (val ? true : false) }
+   end
 
     state = true
     j = 0
@@ -152,11 +156,9 @@ module Enumerable
   end
 
   def my_map
-
     return enum_for(:my_map) unless block_given?
 
     arrayed = []
-
 
     i = 0
 
@@ -169,10 +171,17 @@ module Enumerable
     arrayed
   end
 
-  def my_inject(val = 1)
+  def my_inject(val = nil)
     result = 0
 
-    unshift(val) if val != 1
+    unshift(val) if val.is_a? Integer
+
+    if val.is_a? Symbol
+      loc = val.to_s
+
+      my_inject { |summ, numberr| summ.method(loc).call(numberr) }
+
+    end
 
     i = 0
 
@@ -190,70 +199,68 @@ def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
 
-# puts '>>>Test for my_each'
-# %w[janet junior shem].my_each { |elem| puts elem }
-# puts %w[janet junior shem].my_each
+puts '>>>Test for my_each'
+%w[janet junior shem].my_each { |elem| puts elem }
+puts %w[janet junior shem].my_each
+puts ''
 
-# %w[janet junior shem].my_each 
+puts '>>>Test for my_each_with_index'
+fruits = %w[apple banana strawberry pineapple]
+fruits.my_each_with_index { |fruit, index| puts fruit if index.even? }
+puts ''
 
-# puts ''
+puts '>>>Test for select'
+friends = %w[Sharon Leo Leila Brian Arun]
+my_friends = friends.my_select { |friend| friend != 'Brian' }
+print my_friends
+puts ''
 
-# puts '>>>Test for my_each_with_index'
-# fruits = %w[apple banana strawberry pineapple]
-# fruits.my_each_with_index { |fruit, index| puts fruit if index.even? }
-# puts ''
+puts '>>>Test for all?'
+ages = [19, 59, 70, 23, 140]
+valid = ages.my_all? { |age| age > 10 && age <= 222 }
+puts %w[ant bear cat].my_all?(/a/)
+puts [].all?
+puts valid
+puts ''
 
-# puts '>>>Test for select'
-# friends = %w[Sharon Leo Leila Brian Arun]
-# my_friends = friends.my_select { |friend| friend != 'Brian' }
-# print my_friends
-# puts ''
+puts '>>>Test for any?'
+pet_names = %w[pluto scooby nyan]
+find_scooby = pet_names.my_any? { |pet| pet == 'scoobyy' }
+puts find_scooby
+puts ''
 
-# puts '>>>Test for all?'
-# ages = [19, 59, 70, 23, 140]
-# valid = ages.my_all? { |age| age > 10 && age <= 222 }
-# puts friends.my_all?("ser")
-# puts %w[ant bear cat].my_all?(/a/)   
-# puts [].all?    
-# puts valid
-# puts ''
+puts '>>>Test for none?'
+animals = %w[antth bear cat]
+wrd_len = animals.my_none? { |word| word.length == 5 }
+puts wrd_len
 
-# puts '>>>Test for any?'
-# pet_names = %w[pluto scooby nyan]
-# find_scooby = pet_names.my_any? { |pet| pet == 'scoobyy' }
-# puts find_scooby
-# puts ''
+wrd_len2 = animals.my_none? { |word| word.length >= 4 }
+puts wrd_len2
+puts ''
 
-# puts '>>>Test for none?'
-# animals = %w[antth bear cat]
-# wrd_len = animals.my_none? { |word| word.length == 5 }
-# puts wrd_len
+puts '>>>Test for count'
+nomb = [1, 2, 3, 2, 2, 3, 2, 3]
+puts nomb.count
+puts nomb.my_count(2)
+puts nomb.my_count(&:even?)
+puts ''
 
-# wrd_len2 = animals.my_none? { |word| word.length >= 4 }
-# puts wrd_len2
-# puts ''
+puts '>>>Test for map'
+salaries = [1200, 1500, 1100, 1800]
+sorted = salaries.my_map { |salary| salary - 700 }
+puts sorted
+puts ''
 
-# puts '>>>Test for count'
-# nomb = [1, 2, 3, 2, 2, 3, 2, 3]
-# puts nomb.count
-# puts nomb.my_count(2)
-# puts nomb.my_count(&:even?)
-# puts ''
+puts '>>>Test for inject'
+listed = [3, 6, 37, 45, 10]
+injecteda = listed.my_inject(2) { |sum, number| sum + number }
+puts injecteda
 
-# puts '>>>Test for map'
-# salaries = [1200, 1500, 1100, 1800]
-# sorted = salaries.my_map { |salary| salary - 700 }
-# puts sorted
-# puts ''
+injected = listed.my_inject { |sum, number| sum + number }
+puts injected
+injected = listed.my_inject(:+)
+puts injected
+puts ''
 
-# puts '>>>Test for inject'
-# listed = [3, 6, 37, 45, 10]
-# injecteda = listed.my_inject(2) { |sum, number| sum + number }
-# puts injecteda
-
-# injected = listed.my_inject { |sum, number| sum + number }
-# puts injected
-# puts ''
-
-# puts '>>>Test for multuply_els'
-# puts multiply_els([3, 6, 37, 45, 10])
+puts '>>>Test for multuply_els'
+puts multiply_els([3, 6, 37, 45, 10])
