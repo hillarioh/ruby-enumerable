@@ -39,7 +39,7 @@ module Enumerable
   end
 
   def my_all?(val = nil)
-    return true if size == 0
+    return true if size.zero?
 
     arrayed = []
 
@@ -66,7 +66,7 @@ module Enumerable
   end
 
   def my_any?(val = nil)
-    return false if size == 0
+    return false if size.zero?
 
     arrayed = []
 
@@ -76,7 +76,7 @@ module Enumerable
       my_each { |i| arrayed << (yield(i) == true) }
     elsif !val.nil?
       my_each { |i| i.is_a? arrayed << (val ? true : false) }
-   end
+    end
 
     state = false
 
@@ -94,7 +94,7 @@ module Enumerable
   end
 
   def my_none?(val = nil)
-    return true if size == 0
+    return true if size.zero?
 
     arrayed = []
 
@@ -104,7 +104,7 @@ module Enumerable
       my_each { |i| arrayed << (yield(i) == true) }
     elsif !val.nil?
       my_each { |i| i.is_a? arrayed << (val ? true : false) }
-   end
+    end
 
     state = true
     j = 0
