@@ -209,30 +209,43 @@ module Enumerable
 
   def my_inject(val = nil, val2 = nil)
     result = 0
+    my_array = self
 
     if (val.is_a? Integer) && (val2.is_a? Symbol)
-      unshift(val)
+      my_array.insert(0,val)
       loc = val2.to_s
-      my_inject { |summ, numberr| summ.method(loc).call(numberr) }
+      my_array.my_inject { |summ, numberr| summ.method(loc).call(numberr) }
     end
 
     if val.is_a? Symbol
       loc = val.to_s
-      my_inject { |summ, numberr| summ.method(loc).call(numberr) }
+      my_array.my_inject { |summ, numberr| summ.method(loc).call(numberr) }
 
     end
 
     if (val.is_a? Integer) && block_given?
 
-      unshift(val) if val.is_a? Integer
-
+      insert(0,val)
     end
 
     i = 0
 
-    while i < size - 1
-      self[i + 1] = yield(self[i], self[i + 1]) if block_given?
-      result = self[i + 1] if i == size - 2
+    output = 0 
+    while i < my_array.size - 1
+
+      if i == 0
+        output = yield(my_array[i], my_array[i + 1]) if block_given?
+        # puts output
+      else
+        output = yield(output, my_array[i + 1]) if block_given?
+      end      
+
+      
+      
+      
+
+
+      result = output if i == my_array.size - 2
       i += 1
     end
 
@@ -243,3 +256,15 @@ end
 def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
+
+array = Array.new(10) { rand(0...10) }
+operation = proc { |sum, n| sum + n }
+
+p array.my_inject(&operation) 
+p array.inject(&operation)
+
+
+
+
+# p array.my_inject(&operation) 
+# p array.inject(&operation)
