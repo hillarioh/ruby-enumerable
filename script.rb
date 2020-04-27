@@ -48,19 +48,20 @@ module Enumerable
     elsif block_given?
       my_each { |i| arrayed << yield(i) }
 
-    elsif !val.nil?
-      my_each do |i|
-        arrayed << if i.is_a? val
-                     true
-                   else
-                     false
-                   end
-      end
+    elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
+      my_each { |i| (i.is_a? val) ? arrayed << true : arrayed << false} 
+     
     elsif !val
       my_each do |i|
         arrayed << false if i.nil? || i == false
       end
-
+      
+    elsif val.instance_of? Integer
+      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
+     
+    elsif val.instance_of? String
+      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
+     
     end
 
     state = true
@@ -87,19 +88,20 @@ module Enumerable
     elsif block_given?
       my_each { |i| arrayed << yield(i) }
 
-    elsif !val.nil?
-      my_each do |i|
-        arrayed << if i.is_a? val
-                     true
-                   else
-                     false
-                   end
-      end
+    elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
+      my_each { |i| (i.is_a? val) ? arrayed << true : arrayed << false} 
+     
     elsif !val
       my_each do |i|
-        arrayed << false if i.nil? || i == false
+        arrayed << true if i.nil? || i == false
       end
-
+      
+    elsif val.instance_of? Integer
+      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
+     
+    elsif val.instance_of? String
+      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
+     
     end
 
     state = false
@@ -127,23 +129,30 @@ module Enumerable
     elsif block_given?
       my_each { |i| arrayed << yield(i) }
 
-    elsif !val.nil?
-      my_each do |i|
-        arrayed << if i.is_a? val
-                     true
-                   else
-                     false
-                   end
-      end
+    elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
+      my_each { |i| (i.is_a? val) ? arrayed << true : arrayed << false} 
+     
     elsif !val
       my_each do |i|
-        arrayed << false if i.nil? || i == false
-      end
+        if i.nil? || i == false
+          arrayed << false
+        elsif i == true
+          arrayed <<true
+        end 
 
+      end
+      
+    elsif val.instance_of? Integer
+      my_each{|i| i == val ? arrayed << true : arrayed << false } 
+     
+    elsif val.instance_of? String
+      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
+     
     end
 
     state = true
     j = 0
+
 
     while j < arrayed.size
       if arrayed[j] == true
@@ -209,43 +218,30 @@ module Enumerable
 
   def my_inject(val = nil, val2 = nil)
     result = 0
-    my_array = self
 
     if (val.is_a? Integer) && (val2.is_a? Symbol)
-      my_array.insert(0,val)
+      unshift(val)
       loc = val2.to_s
-      my_array.my_inject { |summ, numberr| summ.method(loc).call(numberr) }
+      my_inject { |summ, numberr| summ.method(loc).call(numberr) }
     end
 
     if val.is_a? Symbol
       loc = val.to_s
-      my_array.my_inject { |summ, numberr| summ.method(loc).call(numberr) }
+      my_inject { |summ, numberr| summ.method(loc).call(numberr) }
 
     end
 
     if (val.is_a? Integer) && block_given?
 
-      insert(0,val)
+      unshift(val) if val.is_a? Integer
+
     end
 
     i = 0
 
-    output = 0 
-    while i < my_array.size - 1
-
-      if i == 0
-        output = yield(my_array[i], my_array[i + 1]) if block_given?
-        # puts output
-      else
-        output = yield(output, my_array[i + 1]) if block_given?
-      end      
-
-      
-      
-      
-
-
-      result = output if i == my_array.size - 2
+    while i < size - 1
+      self[i + 1] = yield(self[i], self[i + 1]) if block_given?
+      result = self[i + 1] if i == size - 2
       i += 1
     end
 
@@ -257,14 +253,15 @@ def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
 
-array = Array.new(10) { rand(0...10) }
-operation = proc { |sum, n| sum + n }
 
-p array.my_inject(&operation) 
-p array.inject(&operation)
+# puts [3, 6, 9].my_inject(2,:*)
+# puts [3,6,9].my_inject(:*)
+# puts [3,6,9].my_inject(2){|memo, ob| memo * ob}
+# puts [3,6,9].my_inject{|memo, ob| memo * ob}
 
+# p [3,3,3].my_all?(3) 
+# p [nil, false, true, []].my_any?
+# p ['dog', 'bird', 'fish'].my_any?('cat')
+# p [nil, false, true, []].my_none?
 
-
-
-# p array.my_inject(&operation) 
-# p array.inject(&operation)
+p ['dog', 'bird', 'fish'].my_none?(5)
