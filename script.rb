@@ -251,14 +251,21 @@ def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
 
-# puts [3, 6, 9].my_inject(2,:*)
-# puts [3,6,9].my_inject(:*)
-# puts [3,6,9].my_inject(2){|memo, ob| memo * ob}
-# puts [3,6,9].my_inject{|memo, ob| memo * ob}
+array = Array.new(10) { rand(0...10) }
+operation = proc { |sum, n| sum + n }
 
-# p [3,3,3].my_all?(3)
-# p [nil, false, true, []].my_any?
-# p ['dog', 'bird', 'fish'].my_any?('cat')
-# p [nil, false, true, []].my_none?
+p array.inject(&operation)
+p array.my_inject(&operation)
 
+array2 = Array.new(10) { rand(0...10) }
+
+p array2.inject(:+)
+p array2.my_inject(:+)
+
+p [3, 3, 3].my_all?(3)
+
+p [nil, false, true, []].my_any?
+p %w[dog bird fish].my_any?('cat')
+
+p [nil, false, true, []].my_none?
 p %w[dog bird fish].my_none?(5)
