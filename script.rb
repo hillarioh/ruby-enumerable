@@ -49,19 +49,19 @@ module Enumerable
       my_each { |i| arrayed << yield(i) }
 
     elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
-      my_each { |i| (i.is_a? val) ? arrayed << true : arrayed << false} 
-     
+      my_each { |i| arrayed << (i.is_a? val ? true : false) }
+
     elsif !val
       my_each do |i|
         arrayed << false if i.nil? || i == false
       end
-      
+
     elsif val.instance_of? Integer
-      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
-     
+      my_each { |i| arrayed << (i == val) }
+
     elsif val.instance_of? String
-      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
-     
+      my_each { |i| arrayed << (i == val) }
+
     end
 
     state = true
@@ -89,19 +89,19 @@ module Enumerable
       my_each { |i| arrayed << yield(i) }
 
     elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
-      my_each { |i| (i.is_a? val) ? arrayed << true : arrayed << false} 
-     
+      my_each { |i| arrayed << (i.is_a? val ? true : false) }
+
     elsif !val
       my_each do |i|
         arrayed << true if i.nil? || i == false
       end
-      
+
     elsif val.instance_of? Integer
-      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
-     
+      my_each { |i| arrayed << (i == val) }
+
     elsif val.instance_of? String
-      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
-     
+      my_each { |i| arrayed << (i == val) }
+
     end
 
     state = false
@@ -130,29 +130,27 @@ module Enumerable
       my_each { |i| arrayed << yield(i) }
 
     elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
-      my_each { |i| (i.is_a? val) ? arrayed << true : arrayed << false} 
-     
+      my_each { |i| arrayed << (i.is_a? val ? true : false) }
+
     elsif !val
       my_each do |i|
         if i.nil? || i == false
           arrayed << false
         elsif i == true
-          arrayed <<true
-        end 
-
+          arrayed << true
+        end
       end
-      
+
     elsif val.instance_of? Integer
-      my_each{|i| i == val ? arrayed << true : arrayed << false } 
-     
+      my_each { |i| arrayed << (i == val) }
+
     elsif val.instance_of? String
-      my_each{|i| i == val ? arrayed << true : arrayed << false  } 
-     
+      my_each { |i| arrayed << (i == val) }
+
     end
 
     state = true
     j = 0
-
 
     while j < arrayed.size
       if arrayed[j] == true
@@ -253,15 +251,14 @@ def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
 
-
 # puts [3, 6, 9].my_inject(2,:*)
 # puts [3,6,9].my_inject(:*)
 # puts [3,6,9].my_inject(2){|memo, ob| memo * ob}
 # puts [3,6,9].my_inject{|memo, ob| memo * ob}
 
-# p [3,3,3].my_all?(3) 
+# p [3,3,3].my_all?(3)
 # p [nil, false, true, []].my_any?
 # p ['dog', 'bird', 'fish'].my_any?('cat')
 # p [nil, false, true, []].my_none?
 
-p ['dog', 'bird', 'fish'].my_none?(5)
+p %w[dog bird fish].my_none?(5)
