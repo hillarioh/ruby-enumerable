@@ -131,53 +131,8 @@ module Enumerable
     state
   end
 
-  def my_none?(val = nil)
-    return true if size.zero?
-
-    arrayed = []
-
-    if val.class == Regexp
-      my_each { |i| arrayed << val.match?(i) }
-    elsif block_given?
-      my_each { |i| arrayed << yield(i) }
-
-    elsif !val.nil?
-      my_each do |i|
-        arrayed << if i.class == val.class
-                     (i == val)
-
-                   elsif val.class == Class
-                     if i.is_a? val
-                       true
-                     else
-                       false
-                     end
-
-                   else
-                     false
-                   end
-      end
-
-    elsif !val
-      my_each do |i|
-        arrayed << (i == false && i.nil?) ? true : false
-      end
-    end
-
-    state = true
-    j = 0
-
-    while j < arrayed.size
-      if arrayed[j] == true
-        state = false
-        break
-
-      end
-      j += 1
-
-    end
-
-    state
+  def my_none?(arg = nil, &block)
+    !my_any?(arg, &block)
   end
 
   def my_count(val = 1)
@@ -250,3 +205,22 @@ end
 def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
+
+array = [1, 2, 5, 4, 7]
+
+print array.my_none?
+p array.none?
+
+# TEST CASES - NONE
+print [nil, false, true, []].my_none? # should return false
+p [nil, false, true, []].none? # should return false
+print %w[dog bird fish].my_none?(5) # should return true
+p %w[dog bird fish].none?(5) # should return true
+print [1, 2, 3].my_none?(String) # should return true
+p [1, 2, 3].none?(String) # should return true
+print %w[1 2 3].my_none?(String) # should return false
+p %w[1 2 3].none?(String) # should return false
+
+array = [nil, false, nil, false]
+print array.my_none?
+p array.none? # true
