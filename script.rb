@@ -205,4 +205,3 @@ end
 def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
-
