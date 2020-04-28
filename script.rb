@@ -206,21 +206,3 @@ def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
 
-array = [1, 2, 5, 4, 7]
-
-print array.my_none?
-p array.none?
-
-# TEST CASES - NONE
-print [nil, false, true, []].my_none? # should return false
-p [nil, false, true, []].none? # should return false
-print %w[dog bird fish].my_none?(5) # should return true
-p %w[dog bird fish].none?(5) # should return true
-print [1, 2, 3].my_none?(String) # should return true
-p [1, 2, 3].none?(String) # should return true
-print %w[1 2 3].my_none?(String) # should return false
-p %w[1 2 3].none?(String) # should return false
-
-array = [nil, false, nil, false]
-print array.my_none?
-p array.none? # true
