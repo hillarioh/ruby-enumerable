@@ -48,20 +48,26 @@ module Enumerable
     elsif block_given?
       my_each { |i| arrayed << yield(i) }
 
-    elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
-      my_each { |i| arrayed << (i.is_a? val ? true : false) }
+    elsif !val.nil?
+      my_each do |i|
+        arrayed << if i.class == val.class
+                     (i == val)
+
+                   elsif val.class == Class
+                     if i.is_a? val
+                       true
+                     else
+                       false
+                     end
+                   else
+                     false
+                   end
+      end
 
     elsif !val
       my_each do |i|
         arrayed << false if i.nil? || i == false
       end
-
-    elsif val.instance_of? Integer
-      my_each { |i| arrayed << (i == val) }
-
-    elsif val.instance_of? String
-      my_each { |i| arrayed << (i == val) }
-
     end
 
     state = true
@@ -88,20 +94,22 @@ module Enumerable
     elsif block_given?
       my_each { |i| arrayed << yield(i) }
 
-    elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
-      my_each { |i| arrayed << (i.is_a? val ? true : false) }
+    elsif !val.nil?
+      my_each do |i|
+        arrayed << if i.class == val.class
+                     (i == val)
+
+                   elsif val.class == Class
+                     i.is_a? val ? true : false
+                   else
+                     false
+                   end
+      end
 
     elsif !val
       my_each do |i|
-        arrayed << true if i.nil? || i == false
+        arrayed << (i == false || i.nil? ? false : true)
       end
-
-    elsif val.instance_of? Integer
-      my_each { |i| arrayed << (i == val) }
-
-    elsif val.instance_of? String
-      my_each { |i| arrayed << (i == val) }
-
     end
 
     state = false
@@ -129,24 +137,27 @@ module Enumerable
     elsif block_given?
       my_each { |i| arrayed << yield(i) }
 
-    elsif !val.nil? && !(val.instance_of? Integer) && !(val.instance_of? String)
-      my_each { |i| arrayed << (i.is_a? val ? true : false) }
+    elsif !val.nil?
+      my_each do |i|
+        arrayed << if i.class == val.class
+                     (i == val)
+
+                   elsif val.class == Class
+                     if i.is_a? val
+                       true
+                     else
+                       false
+                     end
+
+                   else
+                     false
+                   end
+      end
 
     elsif !val
       my_each do |i|
-        if i.nil? || i == false
-          arrayed << false
-        elsif i == true
-          arrayed << true
-        end
+        arrayed << (i == false || i.nil?) ? true : false
       end
-
-    elsif val.instance_of? Integer
-      my_each { |i| arrayed << (i == val) }
-
-    elsif val.instance_of? String
-      my_each { |i| arrayed << (i == val) }
-
     end
 
     state = true
@@ -214,36 +225,21 @@ module Enumerable
     arrayed
   end
 
-  def my_inject(val = nil, val2 = nil)
-    result = 0
+  def my_inject(initial = nil, second = nil)
+    arr = is_a?(Array) ? self : to_a
+    sym = initial if initial.is_a?(Symbol) || initial.is_a?(String)
+    acc = initial if initial.is_a? Integer
 
-    if (val.is_a? Integer) && (val2.is_a? Symbol)
-      unshift(val)
-      loc = val2.to_s
-      my_inject { |summ, numberr| summ.method(loc).call(numberr) }
+    if initial.is_a?(Integer)
+      sym = second if second.is_a?(Symbol) || second.is_a?(String)
     end
 
-    if val.is_a? Symbol
-      loc = val.to_s
-      my_inject { |summ, numberr| summ.method(loc).call(numberr) }
-
+    if sym
+      arr.my_each { |x| acc = acc ? acc.send(sym, x) : x }
+    elsif block_given?
+      arr.my_each { |x| acc = acc ? yield(acc, x) : x }
     end
-
-    if (val.is_a? Integer) && block_given?
-
-      unshift(val) if val.is_a? Integer
-
-    end
-
-    i = 0
-
-    while i < size - 1
-      self[i + 1] = yield(self[i], self[i + 1]) if block_given?
-      result = self[i + 1] if i == size - 2
-      i += 1
-    end
-
-    result
+    acc
   end
 end
 
@@ -251,21 +247,35 @@ def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
 
-array = Array.new(10) { rand(0...10) }
-operation = proc { |sum, n| sum + n }
+# TEST CASES - INJECT
+# array = Array.new(10) { rand(0...10) }
+# operation = proc { |sum, n| sum + n }
 
-p array.inject(&operation)
-p array.my_inject(&operation)
+# p array.inject(&operation)
+# p array.my_inject(&operation)
+# p array.inject(:+)
+# p array.my_inject(:+)
+# p [1, 2, 3].my_inject { |memo, num| memo + num } #should return 6
+# p [1, 2, 3].my_inject(1) { |memo, num| memo + num } #should return 7
+# p [1, 2, 3].my_inject(:+)  #should return 6
+# p [1, 2, 3].my_inject(1, :+)  #should return 7
 
-array2 = Array.new(10) { rand(0...10) }
+# TEST CASES - ALL
+# p [3, 3, 3].my_all?(3)
+# p [3, 3, 3].my_all?(Integer)
+# p [1, 2, nil].my_all?(Integer) #should return false
+# p [[1, 2, 3],[1, 2]].my_all?(Array)  #should return true
 
-p array2.inject(:+)
-p array2.my_inject(:+)
+# TEST CASES - ANY
+# p [nil, false, true, []].my_any? # should return true
+# p %w[dog bird fish].my_any?('cat') # should return false
+# p [1, 2, 3].my_any? # should return true
+# p [1, 2, nil].my_any? # should return true
+# p [false, false, nil].my_any? # should return false
+# p [[], []].my_any? # should return true
 
-p [3, 3, 3].my_all?(3)
-
-p [nil, false, true, []].my_any?
-p %w[dog bird fish].my_any?('cat')
-
-p [nil, false, true, []].my_none?
-p %w[dog bird fish].my_none?(5)
+# TEST CASES - NONE
+p [nil, false, true, []].my_none? # should return false
+p %w[dog bird fish].my_none?(5) # should return true
+p [1, 2, 3].my_none?(String) # should return true
+p %w[1 2 3].my_none?(String) # should return false
