@@ -100,7 +100,11 @@ module Enumerable
                      (i == val)
 
                    elsif val.class == Class
-                     i.is_a? val ? true : false
+                     if i.is_a? val
+                       true
+                     else
+                       false
+                     end
                    else
                      false
                    end
@@ -156,7 +160,7 @@ module Enumerable
 
     elsif !val
       my_each do |i|
-        arrayed << (i == false || i.nil?) ? true : false
+        arrayed << (i == false && i.nil?) ? true : false
       end
     end
 
@@ -246,36 +250,3 @@ end
 def multiply_els(my_array)
   my_array.my_inject { |product, number| product * number }
 end
-
-# TEST CASES - INJECT
-# array = Array.new(10) { rand(0...10) }
-# operation = proc { |sum, n| sum + n }
-
-# p array.inject(&operation)
-# p array.my_inject(&operation)
-# p array.inject(:+)
-# p array.my_inject(:+)
-# p [1, 2, 3].my_inject { |memo, num| memo + num } #should return 6
-# p [1, 2, 3].my_inject(1) { |memo, num| memo + num } #should return 7
-# p [1, 2, 3].my_inject(:+)  #should return 6
-# p [1, 2, 3].my_inject(1, :+)  #should return 7
-
-# TEST CASES - ALL
-# p [3, 3, 3].my_all?(3)
-# p [3, 3, 3].my_all?(Integer)
-# p [1, 2, nil].my_all?(Integer) #should return false
-# p [[1, 2, 3],[1, 2]].my_all?(Array)  #should return true
-
-# TEST CASES - ANY
-# p [nil, false, true, []].my_any? # should return true
-# p %w[dog bird fish].my_any?('cat') # should return false
-# p [1, 2, 3].my_any? # should return true
-# p [1, 2, nil].my_any? # should return true
-# p [false, false, nil].my_any? # should return false
-# p [[], []].my_any? # should return true
-
-# TEST CASES - NONE
-p [nil, false, true, []].my_none? # should return false
-p %w[dog bird fish].my_none?(5) # should return true
-p [1, 2, 3].my_none?(String) # should return true
-p %w[1 2 3].my_none?(String) # should return false
